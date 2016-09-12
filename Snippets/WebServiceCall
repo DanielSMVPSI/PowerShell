@@ -1,0 +1,11 @@
+
+#example of calling a web service in PowerShell
+
+$URI = "http://www.holidaywebservice.com/HolidayService_v2/HolidayService2.asmx"
+$szProx = New-WebServiceProxy -Uri $URI -Class holidays -Namespace webservice
+
+#$szProx | gm
+
+
+$szProx.GetHolidaysForYear('UnitedStates','2016') 
+
