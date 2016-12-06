@@ -1,0 +1,84 @@
+
+# The variable we're searching for
+$varName = "myvar"
+
+Write-Host "Searching for $VarName ...."
+
+Write-Host "----------------------------------------"
+
+
+#
+# For Variables in source
+# Create a PS Drive
+New-PSDrive JD JAMS localhost -ErrorAction SilentlyContinue
+
+
+# For Variable dependencies
+# The Folder we're searching through
+$Jobs = Get-ChildItem JD:\testing\* 
+
+
+# Loop through the Jobs to find any containing a matching Dependency
+foreach($j in $Jobs)
+{
+    foreach($d in $j.Dependencies)
+    { 
+        if (($d.DependencyType -eq [MVPSI.JAMS.DependencyType]::Variable) -and ($d.DependencyName -eq $varName))
+        {
+            Write-Host "$($J.Name) contains $($varName) as a Dependency."
+        }
+    }
+}
+
+Write-Host "----------------------------------------"
+
+# For Variable Parameters
+# The Folder we're searching through
+$Jobs = Get-ChildItem JD:\testing\* 
+# The variable we're searching for
+# Loop through the Jobs to find any containing a matching Dependency
+foreach($j in $Jobs)
+{
+    # Check parameters on the Job/Setup
+    if($j -is [MVPSI.JAMS.Job])
+    {
+        foreach($p in $j.Parameters)
+        {
+            if ($p.Variable.Name -eq $varName ) {
+                Write-Host "Job: $($J.Name) contains $($varName ) as a Parameter Value for Param: $($p.ParamName)"
+            }
+        }
+    }
+    elseif($j -is [MVPSI.JAMS.Setup])
+    {
+        # Check parameters on each SetupJob
+        foreach($sj in $j.Jobs)
+        {
+            foreach($p in $sj.Parameters)
+            {
+            #"Param: $($p.ParamName), Variable: $($p.VariableName))"
+              if ($p.Variable.Name -eq $varName ) {
+                    Write-Host "SetupJob: $($sj.Name) of Setup: $($j.Name) contains $($varName ) as a Parameter Value for Param: $($p.ParamName)"
+                }
+            }
+        }
+    }
+}
+
+
+
+Write-Host "----------------------------------------"
+
+
+
+# The Folder to search
+$Jobs = Get-ChildItem JD:\testing\*
+
+
+# Loop through the collection to search each Job's Source
+foreach ($j in $Jobs) {
+    $Source = $j.Source
+    if ($Source -match $varName ) {
+        Write-Host "$varName  found in $($J.JobName)"
+    }
+}
