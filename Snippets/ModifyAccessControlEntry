@@ -1,0 +1,33 @@
+Import-Module JAMS
+
+function Modify-AccessControl {
+    param(
+        [string]$accessControlFolderPath,
+        [string]$securityIdentity,
+        [int]$accessBits
+    )
+    $securityFolder = Get-Item $accessControlFolderPath
+
+    $ace = $securityFolder.ACL.GenericACL | Where { $_.Identifier -eq $securityIdentity } | Select-Object
+    if ($ace -ne $null)
+    {
+        $securityFolder.ACL.GenericACL.Remove($ace)
+        $securityFolder.ACL.GenericACL | Format-List
+    }
+
+    $ace = $securityFolder.ACL.GenericACL.AddNew()
+    $ace.Identifier = $securityIdentity
+    $ace.AccessBits = $accessBits
+    $securityFolder.Update()
+}
+
+$path = 'JAMS::localhost\Security\JobDefinitions'
+$identifier = 'MVPSALES18\DanielS'
+$bits = [MVPSI.JAMS.AppRights]::Add -bor [MVPSI.JAMS.AppRights]::Change -bor [MVPSI.JAMS.AppRights]::Inquire -bor [MVPSI.JAMS.AppRights]::Delete
+Modify-AccessControl -accessControlFolderPath 'JAMS::localhost\Security\JobDefinitions' -securityIdentity $identifier -accessBits $bits
+
+$bits = [MVPSI.JAMS.AppRights]::Abort -bor [MVPSI.JAMS.AppRights]::Execute -bor [MVPSI.JAMS.AppRights]::Manage -bor [MVPSI.JAMS.AppRights]::SeeAll -bor [MVPSI.JAMS.AppRights]::SeeOwn
+Modify-AccessControl -accessControlFolderPath 'JAMS::localhost\Security\Monitor' -securityIdentity $identifier -accessBits $bits
+
+$bits = [MVPSI.JAMS.AppRights]::Add -bor [MVPSI.JAMS.AppRights]::Change -bor [MVPSI.JAMS.AppRights]::Inquire -bor [MVPSI.JAMS.AppRights]::Delete
+Modify-AccessControl -accessControlFolderPath 'JAMS::localhost\Security\UsernameDefinitions' -securityIdentity $identifier -accessBits $bits
