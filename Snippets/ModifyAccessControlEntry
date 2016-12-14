@@ -1,3 +1,5 @@
+#Created by Esten Rye of ProtoLabs
+
 Import-Module JAMS
 
 function Modify-AccessControl {
