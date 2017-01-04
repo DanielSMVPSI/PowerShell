@@ -1,0 +1,19 @@
+#In this example, LEFT is the remote source of a JAMS folder structure that is being copied.
+
+#Localhost is the destination of the remote folder structure being copied. 
+
+New-PsDrive JDLeft JAMS Left -EA SilentlyContinue
+New-PSDrive JD JAMS localhost -EA SilentlyContinue
+
+$RemotePath = "JDLeft:\Test\"
+$LocalPath = "JD:\Testing\"
+
+#Keep in mind that UserNames referenced at the folder level must exist prior to performing the copy. 
+
+$SourceFolders = (Get-ChildItem $RemotePath -ObjectType folder).FolderName
+
+ForEach($Folder in $SourceFolders)
+{
+copy-item ("$RemotePath" + "$Folder") $LocalPath -Recurse -Container -Verbose
+}
+
