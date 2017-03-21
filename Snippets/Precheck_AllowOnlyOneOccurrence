@@ -1,0 +1,19 @@
+Import-Module JAMS
+
+$jobName = (Get-JAMSEntry <<JAMS_PRECHECK_ENTRY>>).Name
+$entry = (Get-JAMSEntry <<JAMS_PRECHECK_ENTRY>>).JAMSEntry
+write-host $jobName
+write-host $entry
+$jobCount = Get-JAMSEntry $jobName -State Executing,Pending,Holding
+
+if($jobCount.Count -ne 0)
+{
+Write-Host "Job $jobName was found in schedule"
+Write-Host "Canceling to INFO status"
+Start-Sleep 3
+Get-JAMSEntry <<JAMS_PRECHECK_ENTRY>> | Stop-JAMSEntry   -Severity Info -Confirm:$false
+}
+Else
+{
+$Host.SetShouldExit(0)
+}
